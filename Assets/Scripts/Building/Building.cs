@@ -1,0 +1,48 @@
+using System;
+using UnityEngine;
+
+namespace Building
+{
+    public class Building : SelectableObject
+    {
+        public int price;
+        public int xSize;
+        public int zSize;
+
+        private BuildingPlacer _buildingPlacer;
+
+        private Color _startColor;
+        public Renderer itemRenderer;
+
+        private void Awake()
+        {
+            _startColor = itemRenderer.material.color;
+        }
+
+        private void OnDrawGizmos()
+        {
+            _buildingPlacer = FindObjectOfType<BuildingPlacer>();
+            
+            for (int x = 0; x < xSize; x++)
+            {
+                for (int z = 0; z < zSize; z++)
+                {
+                    Gizmos.DrawWireCube(
+                        transform.position + new Vector3(x, 0, z) * _buildingPlacer.cellSize,
+                        new Vector3(1, 0, 1) * _buildingPlacer.cellSize
+                    );
+                }
+            }
+        }
+
+        public void DisplayUnacceptablePosition()
+        {
+            itemRenderer.material.color = Color.red;
+        }
+
+        public void DisplayAcceptablePosition()
+        {
+            itemRenderer.material.color = _startColor;
+        }
+    }
+}
