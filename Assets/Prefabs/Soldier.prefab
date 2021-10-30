@@ -204,7 +204,7 @@ GameObject:
   - component: {fileID: 6851163668548851167}
   - component: {fileID: 1556541799}
   m_Layer: 0
-  m_Name: Knight
+  m_Name: Soldier
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -240,6 +240,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectionIndicator: {fileID: 6851163668273941972}
   navMeshAgent: {fileID: 1556541799}
+  price: 0
 --- !u!195 &1556541799
 NavMeshAgent:
   m_ObjectHideFlags: 0

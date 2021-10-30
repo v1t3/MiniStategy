@@ -1,4 +1,4 @@
-using System;
+using Menu;
 using UnityEngine;
 
 namespace Building
@@ -13,6 +13,8 @@ namespace Building
 
         private Color _startColor;
         public Renderer itemRenderer;
+
+        [SerializeField] private CraftMenu craftMenu;
 
         private void Awake()
         {
@@ -43,6 +45,26 @@ namespace Building
         public void DisplayAcceptablePosition()
         {
             itemRenderer.material.color = _startColor;
+        }
+
+        public override void Select()
+        {
+            base.Select();
+
+            if (craftMenu)
+            {
+                craftMenu.gameObject.SetActive(true);
+            }
+        }
+
+        public override void Unselect()
+        {
+            base.Unselect();
+
+            if (craftMenu)
+            {
+                craftMenu.gameObject.SetActive(false);
+            }
         }
     }
 }

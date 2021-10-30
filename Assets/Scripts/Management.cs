@@ -1,6 +1,13 @@
 using System.Collections.Generic;
+using Units;
 using UnityEngine;
 using UnityEngine.UI;
+
+public enum BuildState
+{
+    Installing,
+    Other
+}
 
 public enum SelectionState
 {
@@ -22,6 +29,7 @@ public class Management : MonoBehaviour
     private Vector2 _frameEnd;
     [SerializeField] private float cursorDeltaValue = 10;
 
+    public BuildState currentBuildState = BuildState.Other;
     public SelectionState currentSelectionState = SelectionState.Other;
 
     private void Update()
@@ -133,7 +141,7 @@ public class Management : MonoBehaviour
         }
     }
 
-    private void UnselectAll()
+    public void UnselectAll()
     {
         foreach (var item in listOfSelected)
         {
@@ -147,6 +155,8 @@ public class Management : MonoBehaviour
 
     private void HoverCurrent(SelectableObject selectableObject)
     {
+        if (currentBuildState != BuildState.Other) return;
+        
         if (!_hovered)
         {
             _hovered = selectableObject;
@@ -162,6 +172,8 @@ public class Management : MonoBehaviour
 
     private void UnhoverCurrent()
     {
+        if (currentBuildState != BuildState.Other) return;
+
         if (_hovered)
         {
             _hovered.OnUnhover();

@@ -1,28 +1,30 @@
-using Player;
+﻿using Player;
 using UnityEngine;
 
-namespace Building
+namespace Units
 {
-    public class BuildingButton : MonoBehaviour
+    public class UnitButton : MonoBehaviour
     {
-        public BuildingPlacer buildingPlacer;
-        public GameObject buildingPrefab;
+        private UnitPlacer _unitPlacer;
+        
+        public GameObject unitPrefab;
 
         private PlayerResources _playerResources;
 
         private void Start()
         {
+            _unitPlacer = FindObjectOfType<UnitPlacer>();
             _playerResources = FindObjectOfType<PlayerResources>();
         }
 
         public void TryBuy()
         {
-            int price = buildingPrefab.GetComponent<Building>().price;
+            int price = unitPrefab.GetComponent<Unit>().price;
 
             if (_playerResources.money >= price)
             {
                 _playerResources.money -= price;
-                buildingPlacer.CreateBuilding(buildingPrefab);
+                _unitPlacer.CreateUnit(unitPrefab);
             }
             else
             {

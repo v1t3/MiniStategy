@@ -1,10 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.Security.Cryptography;
+using Player;
 using UnityEngine;
 
 namespace Building
 {
     public class BuildingPlacer : MonoBehaviour
     {
+        private Management _management;
+        private PlayerResources _playerResources;
+
         public float cellSize = 1f;
 
         [SerializeField] private Camera raycastCamera;
@@ -16,7 +21,11 @@ namespace Building
 
         private void Start()
         {
+            _management = FindObjectOfType<Management>();
+            _playerResources = FindObjectOfType<PlayerResources>();
+            
             _plane = new Plane(Vector3.up, Vector3.zero);
+            InstallExistedBuildings();
         }
 
         private void Update()
@@ -36,16 +45,22 @@ namespace Building
             if (CanInstallBuilding(xPosition, zPosition, currentBuilding))
             {
                 currentBuilding.DisplayAcceptablePosition();
-                
+
                 if (Input.GetMouseButtonDown(0))
                 {
                     InstallBuilding(xPosition, zPosition, currentBuilding);
-                    currentBuilding = null;
                 }
+                
             }
             else
             {
                 currentBuilding.DisplayUnacceptablePosition();
+            }
+            
+            // отменить установку по ПКМ или Escape
+            if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
+            {
+                CancelInstallBuilding();
             }
         }
 
@@ -74,12 +89,37 @@ namespace Building
                     buildingPositions.Add(new Vector2Int(xPosition + x, zPosition + z), building);
                 }
             }
+
+            currentBuilding = null;
+            _management.currentBuildState = BuildState.Other;
+        }
+
+        private void InstallExistedBuildings()
+        {
+            var buildings = FindObjectsOfType<Building>();
+
+            foreach (var building in buildings)
+            {
+                var buildingPos = building.transform.position;
+                InstallBuilding((int)buildingPos.x, (int)buildingPos.z, building);
+            }
+        }
+
+        public void CancelInstallBuilding()
+        {
+            int price = currentBuilding.GetComponent<Building>().price;
+            _playerResources.money += price;
+            
+            Destroy(currentBuilding.gameObject);
+            currentBuilding = null;
+            _management.currentBuildState = BuildState.Other;
         }
 
         public void CreateBuilding(GameObject buildingPrefab)
         {
             GameObject newBuilding = Instantiate(buildingPrefab);
             currentBuilding = newBuilding.GetComponent<Building>();
+            _management.currentBuildState = BuildState.Installing;
         }
     }
 }
