@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -9,6 +10,7 @@ namespace Units
         [SerializeField] private NavMeshAgent navMeshAgent;
 
         public int price;
+        public int health = 1;
 
         private bool _isTargetReached;
 
@@ -33,6 +35,17 @@ namespace Units
             base.OnClickOnGround(point);
             navMeshAgent.SetDestination(point);
             _isTargetReached = false;
+        }
+
+        public void TakeDamage(int damageValue)
+        {
+            health -= damageValue;
+
+            if (health <= 0)
+            {
+                health = 0;
+                Debug.Log("unit die");
+            }
         }
     }
 }

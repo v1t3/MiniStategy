@@ -1,4 +1,4 @@
-namespace Building
+namespace BuildingBase
 {
     public class Barack : Building
     {

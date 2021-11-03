@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using Player;
 using UnityEngine;
 
-namespace Building
+namespace BuildingBase
 {
     public class BuildingPlacer : MonoBehaviour
     {

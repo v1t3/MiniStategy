@@ -1,7 +1,7 @@
 using Player;
 using UnityEngine;
 
-namespace Building
+namespace BuildingBase
 {
     public class BuildingButton : MonoBehaviour
     {

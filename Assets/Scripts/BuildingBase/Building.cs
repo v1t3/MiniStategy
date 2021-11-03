@@ -1,7 +1,7 @@
 using Menu;
 using UnityEngine;
 
-namespace Building
+namespace BuildingBase
 {
     public class Building : SelectableObject
     {
@@ -19,6 +19,11 @@ namespace Building
         private void Awake()
         {
             _startColor = itemRenderer.material.color;
+        }
+
+        private void Start()
+        {
+            Unselect();
         }
 
         private void OnDrawGizmos()
