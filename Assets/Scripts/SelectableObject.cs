@@ -5,7 +5,7 @@ public class SelectableObject : MonoBehaviour
 {
     [SerializeField] private GameObject selectionIndicator;
 
-    private void Start()
+    public virtual void Start()
     {
         selectionIndicator.SetActive(false);
     }

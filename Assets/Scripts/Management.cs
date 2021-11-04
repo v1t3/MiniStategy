@@ -145,7 +145,10 @@ public class Management : MonoBehaviour
     {
         foreach (var item in listOfSelected)
         {
-            item.Unselect();
+            if (item)
+            {
+                item.Unselect();
+            }
         }
 
         listOfSelected.Clear();

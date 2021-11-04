@@ -7,12 +7,27 @@ namespace Units
 {
     public class Unit : SelectableObject
     {
+        private Management _management;
+        
         [SerializeField] private NavMeshAgent navMeshAgent;
 
         public int price;
         public int health = 1;
+        private int _maxHealth;
 
         private bool _isTargetReached;
+
+        [SerializeField] private HealthBar healthBar;
+
+        public override void Start()
+        {
+            base.Start();
+            
+            _management = FindObjectOfType<Management>();
+            
+            _maxHealth = health;
+            healthBar.Setup();
+        }
 
         private void Update()
         {
@@ -40,12 +55,19 @@ namespace Units
         public void TakeDamage(int damageValue)
         {
             health -= damageValue;
+            healthBar.SetHealth(health, _maxHealth);
 
             if (health <= 0)
             {
                 health = 0;
-                Debug.Log("unit die");
+                Destroy(gameObject);
             }
+        }
+
+        private void OnDestroy()
+        {
+            Debug.Log("unit die");
+            _management.UnselectAll();
         }
     }
 }

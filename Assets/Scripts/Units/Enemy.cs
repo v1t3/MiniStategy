@@ -17,8 +17,10 @@ namespace Units
     public class Enemy : MonoBehaviour
     {
         public EnemyState currentEnemyState;
-        public Building _targetBuilding;
-        public Unit _targetUnit;
+        private Building _targetBuilding;
+        private Unit _targetUnit;
+
+        [SerializeField] private HealthBar healthBar;
         [SerializeField] private float health = 1;
         [SerializeField] private float distanceToFollow = 7;
         [SerializeField] private float distanceToAttack = 1;
