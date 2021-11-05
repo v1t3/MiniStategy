@@ -90,6 +90,7 @@ namespace BuildingBase
                 }
             }
 
+            currentBuilding.SetState(BuildingState.Placed);
             currentBuilding = null;
             _management.currentBuildState = BuildState.Other;
         }

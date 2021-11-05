@@ -39,7 +39,7 @@ public class Management : MonoBehaviour
         Debug.DrawRay(ray.origin, ray.direction * 10f, Color.red);
 
         RaycastHit hit;
-        
+
         if (Physics.Raycast(ray, out hit))
         {
             if (hit.collider && hit.collider.GetComponent<SelectableCollider>())
@@ -73,9 +73,16 @@ public class Management : MonoBehaviour
         {
             if (hit.collider && hit.collider.CompareTag("Ground"))
             {
-                foreach (var item in listOfSelected)
+                int rowNumber = Mathf.CeilToInt(Mathf.Sqrt(listOfSelected.Count));
+                
+                
+                for (var index = 0; index < listOfSelected.Count; index++)
                 {
-                    item.OnClickOnGround(hit.point);
+                    int row = index / rowNumber;
+                    int column = index % rowNumber;
+                    
+                    Vector3 point = hit.point + new Vector3(column, 0, -row);
+                    listOfSelected[index].OnClickOnGround(point);
                 }
             }
         }
@@ -132,12 +139,20 @@ public class Management : MonoBehaviour
         }
     }
 
-    private void Select(SelectableObject selectableObject)
+    public void Select(SelectableObject selectableObject)
     {
         if (!listOfSelected.Contains(selectableObject))
         {
             listOfSelected.Add(selectableObject);
             selectableObject.Select();
+        }
+    }
+
+    public void Unselect(SelectableObject selectableObject)
+    {
+        if (listOfSelected.Contains(selectableObject))
+        {
+            listOfSelected.Remove(selectableObject);
         }
     }
 
@@ -152,14 +167,14 @@ public class Management : MonoBehaviour
         }
 
         listOfSelected.Clear();
-        
+
         currentSelectionState = SelectionState.Other;
     }
 
     private void HoverCurrent(SelectableObject selectableObject)
     {
         if (currentBuildState != BuildState.Other) return;
-        
+
         if (!_hovered)
         {
             _hovered = selectableObject;

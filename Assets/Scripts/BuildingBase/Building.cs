@@ -3,6 +3,12 @@ using UnityEngine;
 
 namespace BuildingBase
 {
+    public enum BuildingState
+    {
+        Placed,
+        Other
+    }
+    
     public class Building : SelectableObject
     {
         public int price;
@@ -10,6 +16,7 @@ namespace BuildingBase
         public int zSize;
 
         private BuildingPlacer _buildingPlacer;
+        public BuildingState currentState = BuildingState.Other;
 
         private Color _startColor;
         public Renderer itemRenderer;
@@ -70,6 +77,11 @@ namespace BuildingBase
             {
                 craftMenu.gameObject.SetActive(false);
             }
+        }
+
+        public void SetState(BuildingState state)
+        {
+            currentState = state;
         }
     }
 }
