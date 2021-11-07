@@ -23,6 +23,7 @@ namespace Units
     public class Unit : SelectableObject
     {
         private Management _management;
+        private BuildingPlacer _buildingPlacer;
 
         private Health _health;
         private Price _price;
@@ -31,6 +32,7 @@ namespace Units
 
         public UnitState currentState;
         private Building _targetBuilding;
+        private Vector3 _targetBuildingPoint;
         private Unit _targetEnemy;
 
         [SerializeField] private NavMeshAgent navMeshAgent;
@@ -55,6 +57,7 @@ namespace Units
             _management = FindObjectOfType<Management>();
             _health = GetComponent<Health>();
             _price = GetComponent<Price>();
+            _buildingPlacer = FindObjectOfType<BuildingPlacer>();
 
             SetState(UnitState.Idle);
         }
@@ -123,6 +126,20 @@ namespace Units
                         SetState(UnitState.Idle);
                     }
 
+                    navMeshAgent.SetDestination(_targetBuildingPoint);
+                    var distance = Vector3.Distance(transform.position, _targetBuildingPoint);
+
+                    if (distance > distanceToFollow)
+                    {
+                        SetState(UnitState.Idle);
+                        return;
+                    }
+
+                    if (distance < distanceToAttack)
+                    {
+                        SetState(UnitState.AttackBuilding);
+                    }
+
                     break;
                 }
                 case UnitState.AttackBuilding:
@@ -135,7 +152,7 @@ namespace Units
 
                     ResetTargetPoint();
 
-                    float distance = Vector3.Distance(transform.position, _targetBuilding.transform.position);
+                    var distance = Vector3.Distance(transform.position, _targetBuildingPoint);
 
                     if (distance > distanceToAttack)
                     {
@@ -246,7 +263,7 @@ namespace Units
                 {
                     if (_targetBuilding)
                     {
-                        navMeshAgent.SetDestination(_targetBuilding.transform.position);
+                        navMeshAgent.SetDestination(_targetBuildingPoint);
                     }
 
                     break;
@@ -266,10 +283,11 @@ namespace Units
             SetState(UnitState.WalkToPoint);
         }
 
-        public void FindClosestEnemyBuilding()
+        private void FindClosestEnemyBuilding()
         {
             Building[] allBuildings = FindObjectsOfType<Building>(false);
             Building closestBuilding = null;
+            Vector3 closestBuildingPoint = Vector3.zero;
             float minDistance = Mathf.Infinity;
 
             foreach (var building in allBuildings)
@@ -283,16 +301,28 @@ namespace Units
                     continue;
                 }
 
-                float distance = Vector3.Distance(transform.position, building.transform.position);
+                var xSize = building.xSize;
+                var zSize = building.zSize;
 
-                if (distance < minDistance && distance < distanceToFollow)
+                for (int x = 0; x < xSize; x++)
                 {
-                    minDistance = distance;
-                    closestBuilding = building;
+                    for (int z = 0; z < zSize; z++)
+                    {
+                        var position = building.transform.position + new Vector3(x, 0, z);
+                        float distance = Vector3.Distance(transform.position, position);
+
+                        if (distance < minDistance && distance < distanceToFollow)
+                        {
+                            minDistance = distance;
+                            closestBuilding = building;
+                            closestBuildingPoint = position;
+                        }
+                    }
                 }
             }
 
             _targetBuilding = closestBuilding;
+            _targetBuildingPoint = closestBuildingPoint;
 
             if (_targetBuilding)
             {
@@ -300,7 +330,7 @@ namespace Units
             }
         }
 
-        public void FindClosestEnemy()
+        private void FindClosestEnemy()
         {
             Unit[] allEnemies = FindObjectsOfType<Unit>();
             Unit closestEnemy = null;
