@@ -1,5 +1,6 @@
 ﻿using System;
 using BuildingBase;
+using PlaceBase;
 using Resources;
 using UnityEditor;
 using UnityEngine;

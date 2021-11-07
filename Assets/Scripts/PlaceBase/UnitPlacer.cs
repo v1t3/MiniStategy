@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using Units;
+using UnityEngine;
 
-namespace Units
+namespace PlaceBase
 {
-    public class UnitPlacer : MonoBehaviour
+    public class UnitPlacer : Placer
     {
         public Transform collectionPoint;
         public Transform instantiatePoint;
@@ -22,8 +23,10 @@ namespace Units
             collectionPoint.gameObject.SetActive(false);
         }
         
-        public void CreateUnit(GameObject unitPrefab)
+        public override void Create(GameObject unitPrefab)
         {
+            base.Create(unitPrefab);
+
             var newUnit = Instantiate(unitPrefab, instantiatePoint.position, instantiatePoint.rotation);
             
             newUnit.GetComponent<Unit>().OnClickOnGround(collectionPoint.position);

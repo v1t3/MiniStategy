@@ -1,4 +1,5 @@
 using Menu;
+using PlaceBase;
 using Resources;
 using UnityEngine;
 
@@ -15,6 +16,7 @@ namespace BuildingBase
     public class Building : SelectableObject
     {
         private BuildingPlacer _buildingPlacer;
+        private UnitPlacer _unitPlacer;
         private Health _health;
         
         public Team team = Team.Neutral;
@@ -28,11 +30,14 @@ namespace BuildingBase
         private Color _startColor;
 
         [SerializeField] private CraftMenu craftMenu;
+        [SerializeField] private UnitButton[] unitButtons;
 
         private void Awake()
         {
             _startColor = itemRenderer.material.color;
             _health = GetComponent<Health>();
+            _unitPlacer = GetComponent<UnitPlacer>();
+            SetBuildingPlacer();
         }
 
         public override void Start()
@@ -40,14 +45,19 @@ namespace BuildingBase
             base.Start();
             
             Unselect();
+
+            if (craftMenu)
+            {
+                foreach (var btn in unitButtons)
+                {
+                    btn.SetPlacer(_unitPlacer);
+                }
+            }
         }
 
         private void OnDrawGizmos()
         {
-            if (!_buildingPlacer)
-            {
-                _buildingPlacer = FindObjectOfType<BuildingPlacer>();
-            }
+            SetBuildingPlacer();
             
             for (int x = 0; x < xSize; x++)
             {
@@ -94,6 +104,14 @@ namespace BuildingBase
         public void SetState(BuildingState state)
         {
             currentState = state;
+        }
+
+        public void SetBuildingPlacer()
+        {
+            if (!_buildingPlacer)
+            {
+                _buildingPlacer = FindObjectOfType<BuildingPlacer>();
+            }
         }
 
         public void TakeDamage(int damageValue)

@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-using System.Security.Cryptography;
+using BuildingBase;
 using Player;
 using Resources;
 using UnityEngine;
 
-namespace BuildingBase
+namespace PlaceBase
 {
-    public class BuildingPlacer : MonoBehaviour
+    public class BuildingPlacer : Placer
     {
         private Management _management;
         private PlayerResources _playerResources;
@@ -61,6 +61,15 @@ namespace BuildingBase
             {
                 CancelInstallBuilding();
             }
+        }
+
+        public override void Create(GameObject buildingPrefab)
+        {
+            base.Create(buildingPrefab);
+            
+            GameObject newBuilding = Instantiate(buildingPrefab);
+            _currentBuilding = newBuilding.GetComponent<Building>();
+            _management.currentBuildState = BuildState.Installing;
         }
 
         public void DisplayUnacceptablePosition()
@@ -122,13 +131,6 @@ namespace BuildingBase
             Destroy(_currentBuilding.gameObject);
             _currentBuilding = null;
             _management.currentBuildState = BuildState.Other;
-        }
-
-        public void CreateBuilding(GameObject buildingPrefab)
-        {
-            GameObject newBuilding = Instantiate(buildingPrefab);
-            _currentBuilding = newBuilding.GetComponent<Building>();
-            _management.currentBuildState = BuildState.Installing;
         }
     }
 }
