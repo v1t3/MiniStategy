@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 815957390925810262}
   - component: {fileID: 815957390925810257}
   - component: {fileID: 815957390925810256}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -106,8 +106,10 @@ GameObject:
   m_Component:
   - component: {fileID: 815957391109556090}
   - component: {fileID: 6072793908518592384}
-  - component: {fileID: 815957391109555974}
-  m_Layer: 0
+  - component: {fileID: 2087949733748405798}
+  - component: {fileID: 4899919971346037662}
+  - component: {fileID: 6039170076939520890}
+  m_Layer: 8
   m_Name: EnemySoldier
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -152,7 +154,7 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 7
   m_ObstacleAvoidanceType: 4
---- !u!114 &815957391109555974
+--- !u!114 &2087949733748405798
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -161,16 +163,48 @@ MonoBehaviour:
   m_GameObject: {fileID: 815957391109555973}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7bb310e57924ab4993e44743f6dc6f4, type: 3}
+  m_Script: {fileID: 11500000, guid: d908ca30fb6446dea8a90271f2b7badc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentEnemyState: 0
-  healthBar: {fileID: 858127531106612332}
-  health: 5
+  selectionIndicator: {fileID: 0}
+  team: 1
+  currentState: 0
   navMeshAgent: {fileID: 6072793908518592384}
   distanceToFollow: 7
   distanceToAttack: 1
   attackPeriod: 1
+  maxFindPeriod: 3
+  onTargetPointReached:
+    m_PersistentCalls:
+      m_Calls: []
+  navigationIndicator: {fileID: 0}
+--- !u!114 &4899919971346037662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 815957391109555973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3004a3128dfc4d8986738ae6ab1ee8e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  price: 5
+--- !u!114 &6039170076939520890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 815957391109555973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 062fd3ed7cf441c6a22e58c0aa2939f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthBar: {fileID: 858127531106612332}
+  healthSize: 5
 --- !u!1 &989977026532647696
 GameObject:
   m_ObjectHideFlags: 0
@@ -180,7 +214,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 989977026532647697}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Center
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -253,9 +287,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2380509812251556574, guid: a3e0e2e3752bca449817e914aab646bd, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2380509812393928286, guid: a3e0e2e3752bca449817e914aab646bd, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2380509812430403688, guid: a3e0e2e3752bca449817e914aab646bd, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 8936158598628626646, guid: a3e0e2e3752bca449817e914aab646bd, type: 3}
       propertyPath: m_Name
       value: HealthBar
+      objectReference: {fileID: 0}
+    - target: {fileID: 8936158598628626646, guid: a3e0e2e3752bca449817e914aab646bd, type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a3e0e2e3752bca449817e914aab646bd, type: 3}

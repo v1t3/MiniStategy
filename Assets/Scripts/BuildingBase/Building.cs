@@ -1,4 +1,5 @@
 using Menu;
+using Resources;
 using UnityEngine;
 
 namespace BuildingBase
@@ -9,33 +10,44 @@ namespace BuildingBase
         Other
     }
     
+    [RequireComponent(typeof(Price))]
+    [RequireComponent(typeof(Health))]
     public class Building : SelectableObject
     {
-        public int price;
+        private BuildingPlacer _buildingPlacer;
+        private Health _health;
+        
+        public Team team = Team.Neutral;
+
         public int xSize;
         public int zSize;
 
-        private BuildingPlacer _buildingPlacer;
         public BuildingState currentState = BuildingState.Other;
 
-        private Color _startColor;
         public Renderer itemRenderer;
+        private Color _startColor;
 
         [SerializeField] private CraftMenu craftMenu;
 
         private void Awake()
         {
             _startColor = itemRenderer.material.color;
+            _health = GetComponent<Health>();
         }
 
-        private void Start()
+        public override void Start()
         {
+            base.Start();
+            
             Unselect();
         }
 
         private void OnDrawGizmos()
         {
-            _buildingPlacer = FindObjectOfType<BuildingPlacer>();
+            if (!_buildingPlacer)
+            {
+                _buildingPlacer = FindObjectOfType<BuildingPlacer>();
+            }
             
             for (int x = 0; x < xSize; x++)
             {
@@ -49,12 +61,12 @@ namespace BuildingBase
             }
         }
 
-        public void DisplayUnacceptablePosition()
+        public void SetColor(Color color)
         {
-            itemRenderer.material.color = Color.red;
+            itemRenderer.material.color = color;
         }
 
-        public void DisplayAcceptablePosition()
+        public void ResetColor()
         {
             itemRenderer.material.color = _startColor;
         }
@@ -82,6 +94,23 @@ namespace BuildingBase
         public void SetState(BuildingState state)
         {
             currentState = state;
+        }
+
+        public void TakeDamage(int damageValue)
+        {
+            _health.DecreaseHealth(damageValue);
+
+            if (_health.healthSize <= 0)
+            {
+                Die();
+            }
+        }
+        
+        public void Die()
+        {
+            Debug.Log("unit die");
+            Unselect();
+            Destroy(gameObject);
         }
     }
 }

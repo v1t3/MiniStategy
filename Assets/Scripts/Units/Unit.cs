@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Security.Cryptography;
 using BuildingBase;
+using Resources;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Events;
 
 namespace Units
 {
@@ -13,22 +14,24 @@ namespace Units
         WalkToPoint,
         WalkToBuilding,
         WalkToEnemy,
-        Attack
+        AttackBuilding,
+        AttackUnit
     }
 
+    [RequireComponent(typeof(Price))]
+    [RequireComponent(typeof(Health))]
     public class Unit : SelectableObject
     {
         private Management _management;
 
-        public int price;
+        private Health _health;
+        private Price _price;
 
-        [SerializeField] private HealthBar healthBar;
-        public int health = 1;
-        private int _maxHealth;
+        public Team team = Team.Neutral;
 
         public UnitState currentState;
         private Building _targetBuilding;
-        private Enemy _targetEnemy;
+        private Unit _targetEnemy;
 
         [SerializeField] private NavMeshAgent navMeshAgent;
         [SerializeField] private float distanceToFollow = 7;
@@ -38,91 +41,106 @@ namespace Units
 
         private Vector3 _targetPoint;
         private bool _isTargetReached;
+        private Vector3 _walkToPointTimer;
 
-        [SerializeField] private GameObject navigationIndicator;
+        [SerializeField] private float maxFindPeriod = 3;
+        private float _findTimer;
+
+        [Space] [SerializeField] private UnityEvent onTargetPointReached;
 
         public override void Start()
         {
             base.Start();
 
             _management = FindObjectOfType<Management>();
+            _health = GetComponent<Health>();
+            _price = GetComponent<Price>();
 
-            _maxHealth = health;
-            healthBar.Setup();
             SetState(UnitState.Idle);
-            navigationIndicator.SetActive(false);
-            navigationIndicator.transform.parent = null;
         }
 
         private void Update()
         {
-            if (currentState == UnitState.Idle)
+            switch (currentState)
             {
-                FindClosestUnit();
-            }
-            else if (currentState == UnitState.WalkToPoint)
-            {
-                FindClosestUnit();
-
-                if (
-                    !_isTargetReached &&
-                    !navMeshAgent.pathPending &&
-                    navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance
-                )
+                case UnitState.Idle:
                 {
-                    if (!navMeshAgent.hasPath || navMeshAgent.velocity.sqrMagnitude == 0f)
+                    FindClosestEnemyBuilding();
+                    FindClosestEnemy();
+
+                    break;
+                }
+                case UnitState.WalkToPoint:
+                {
+                    _findTimer += Time.deltaTime;
+
+                    if (_findTimer > maxFindPeriod)
                     {
-                        _isTargetReached = true;
-                        navigationIndicator.SetActive(false);
-                        navMeshAgent.ResetPath();
+                        _findTimer = 0;
+                        FindClosestEnemyBuilding();
+                        FindClosestEnemy();
+                    }
+
+                    if (IsTargetPointReached())
+                    {
+                        ResetTargetPoint();
                         SetState(UnitState.Idle);
                     }
-                }
-            }
-            else if (currentState == UnitState.WalkToEnemy)
-            {
-                if (_targetEnemy)
-                {
-                    navMeshAgent.SetDestination(_targetEnemy.transform.position);
 
-                    float distance = Vector3.Distance(transform.position, _targetEnemy.transform.position);
+                    break;
+                }
+                case UnitState.WalkToEnemy:
+                {
+                    if (!_targetEnemy)
+                    {
+                        SetState(UnitState.Idle);
+                        return;
+                    }
+
+                    var enemyPosition = _targetEnemy.transform.position;
+                    navMeshAgent.SetDestination(enemyPosition);
+                    float distance = Vector3.Distance(transform.position, enemyPosition);
 
                     if (distance > distanceToFollow)
                     {
                         SetState(UnitState.Idle);
+                        return;
                     }
 
                     if (distance < distanceToAttack)
                     {
-                        SetState(UnitState.Attack);
+                        SetState(UnitState.AttackUnit);
                     }
-                }
-                else
-                {
-                    SetState(UnitState.Idle);
-                }
-            }
-            else if (currentState == UnitState.WalkToBuilding)
-            {
-                FindClosestUnit();
 
-                if (!_targetBuilding)
-                {
-                    SetState(UnitState.Idle);
+                    break;
                 }
-            }
-            else if (currentState == UnitState.Attack)
-            {
-                if (_targetEnemy)
+                case UnitState.WalkToBuilding:
                 {
-                    _isTargetReached = true;
-                    navMeshAgent.ResetPath();
+                    FindClosestEnemy();
 
-                    float distance = Vector3.Distance(transform.position, _targetEnemy.transform.position);
+                    if (!_targetBuilding)
+                    {
+                        SetState(UnitState.Idle);
+                    }
+
+                    break;
+                }
+                case UnitState.AttackBuilding:
+                {
+                    if (!_targetBuilding)
+                    {
+                        SetState(UnitState.Idle);
+                        return;
+                    }
+
+                    ResetTargetPoint();
+
+                    float distance = Vector3.Distance(transform.position, _targetBuilding.transform.position);
 
                     if (distance > distanceToAttack)
                     {
-                        SetState(UnitState.WalkToEnemy);
+                        SetState(UnitState.WalkToBuilding);
+                        return;
                     }
 
                     _attackTimer += Time.deltaTime;
@@ -131,12 +149,107 @@ namespace Units
                     {
                         //урон
                         _attackTimer = 0;
-                        _targetEnemy.TakeDamage(1);
+                        AttackBuilding();
                     }
+
+                    break;
                 }
-                else
+                case UnitState.AttackUnit:
                 {
-                    SetState(UnitState.Idle);
+                    if (!_targetEnemy)
+                    {
+                        SetState(UnitState.Idle);
+                        return;
+                    }
+
+                    ResetTargetPoint();
+
+                    var enemyPosition = _targetEnemy.transform.position;
+                    float distance = Vector3.Distance(transform.position, enemyPosition);
+
+                    if (distance > distanceToAttack)
+                    {
+                        SetState(UnitState.WalkToEnemy);
+                        return;
+                    }
+
+                    _attackTimer += Time.deltaTime;
+
+                    if (_attackTimer > attackPeriod)
+                    {
+                        //урон
+                        _attackTimer = 0;
+                        AttackUnit();
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        public virtual void AttackBuilding()
+        {
+            _targetBuilding.TakeDamage(1);
+        }
+
+        public virtual void AttackUnit()
+        {
+            _targetEnemy.TakeDamage(1);
+        }
+
+        private bool IsTargetPointReached()
+        {
+            if (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
+            {
+                return false;
+            }
+
+            return !navMeshAgent.hasPath || navMeshAgent.velocity.sqrMagnitude == 0f;
+        }
+
+        private void ResetTargetPoint()
+        {
+            navMeshAgent.ResetPath();
+            onTargetPointReached.Invoke();
+        }
+
+        private void SetState(UnitState state)
+        {
+            currentState = state;
+
+            switch (currentState)
+            {
+                case UnitState.Idle:
+                {
+                    break;
+                }
+                case UnitState.WalkToPoint:
+                {
+                    if (_targetPoint != Vector3.zero)
+                    {
+                        _findTimer = 0;
+                        navMeshAgent.SetDestination(_targetPoint);
+                    }
+
+                    break;
+                }
+                case UnitState.WalkToEnemy:
+                {
+                    if (_targetEnemy)
+                    {
+                        navMeshAgent.SetDestination(_targetEnemy.transform.position);
+                    }
+
+                    break;
+                }
+                case UnitState.WalkToBuilding:
+                {
+                    if (_targetBuilding)
+                    {
+                        navMeshAgent.SetDestination(_targetBuilding.transform.position);
+                    }
+
+                    break;
                 }
             }
         }
@@ -144,74 +257,35 @@ namespace Units
         public override void OnClickOnGround(Vector3 point)
         {
             base.OnClickOnGround(point);
-            
+            GoToPoint(point);
+        }
+
+        public void GoToPoint(Vector3 point)
+        {
             _targetPoint = point;
-            navigationIndicator.SetActive(true);
-            navigationIndicator.transform.position = new Vector3(
-                point.x,
-                navigationIndicator.transform.position.y,
-                point.z
-            );
-            
             SetState(UnitState.WalkToPoint);
         }
 
-        public void TakeDamage(int damageValue)
+        public void FindClosestEnemyBuilding()
         {
-            health -= damageValue;
-            healthBar.SetHealth(health, _maxHealth);
-
-            if (health <= 0)
-            {
-                health = 0;
-                Destroy(gameObject);
-            }
-        }
-
-        private void OnDestroy()
-        {
-            Debug.Log("unit die");
-            _management.Unselect(this);
-        }
-
-        public void SetState(UnitState state)
-        {
-            currentState = state;
-
-            if (currentState == UnitState.Idle)
-            {
-                // FindClosestBuilding();
-            }
-            else if (currentState == UnitState.WalkToPoint)
-            {
-                navMeshAgent.SetDestination(_targetPoint);
-                _isTargetReached = false;
-            }
-            else if (currentState == UnitState.WalkToEnemy)
-            {
-                navMeshAgent.SetDestination(_targetEnemy.transform.position);
-            }
-            else if (currentState == UnitState.WalkToBuilding)
-            {
-                navMeshAgent.SetDestination(_targetBuilding.transform.position);
-            }
-            else if (currentState == UnitState.Attack)
-            {
-                _attackTimer = 0;
-            }
-        }
-
-        public void FindClosestBuilding()
-        {
-            Building[] allBuildings = FindObjectsOfType<Building>();
+            Building[] allBuildings = FindObjectsOfType<Building>(false);
             Building closestBuilding = null;
             float minDistance = Mathf.Infinity;
 
             foreach (var building in allBuildings)
             {
+                if (
+                    building.currentState != BuildingState.Placed ||
+                    building.team == team ||
+                    building.team == Team.Neutral
+                )
+                {
+                    continue;
+                }
+
                 float distance = Vector3.Distance(transform.position, building.transform.position);
 
-                if (distance < minDistance)
+                if (distance < minDistance && distance < distanceToFollow)
                 {
                     minDistance = distance;
                     closestBuilding = building;
@@ -226,14 +300,19 @@ namespace Units
             }
         }
 
-        public void FindClosestUnit()
+        public void FindClosestEnemy()
         {
-            Enemy[] allEnemies = FindObjectsOfType<Enemy>();
-            Enemy closestEnemy = null;
+            Unit[] allEnemies = FindObjectsOfType<Unit>();
+            Unit closestEnemy = null;
             float minDistance = Mathf.Infinity;
 
             foreach (var enemy in allEnemies)
             {
+                if (enemy.team == team || enemy.team == Team.Neutral)
+                {
+                    continue;
+                }
+
                 float distance = Vector3.Distance(transform.position, enemy.transform.position);
 
                 if (distance < minDistance && distance < distanceToFollow)
@@ -251,14 +330,32 @@ namespace Units
             }
         }
 
+        public void TakeDamage(int damageValue)
+        {
+            _health.DecreaseHealth(damageValue);
+
+            if (_health.healthSize <= 0)
+            {
+                Die();
+            }
+        }
+
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
+            var position = transform.position;
             Handles.color = Color.yellow;
-            Handles.DrawWireDisc(transform.position, Vector3.up, distanceToFollow);
+            Handles.DrawWireDisc(position, Vector3.up, distanceToFollow);
             Handles.color = Color.red;
-            Handles.DrawWireDisc(transform.position, Vector3.up, distanceToAttack);
+            Handles.DrawWireDisc(position, Vector3.up, distanceToAttack);
         }
 #endif
+
+        public void Die()
+        {
+            Debug.Log("unit die");
+            _management.Unselect(this);
+            Destroy(gameObject);
+        }
     }
 }

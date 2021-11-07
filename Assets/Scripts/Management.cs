@@ -3,6 +3,13 @@ using Units;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum Team
+{
+    Player,
+    Enemy,
+    Neutral
+}
+
 public enum BuildState
 {
     Installing,
@@ -35,7 +42,7 @@ public class Management : MonoBehaviour
     private void Update()
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-
+        //Луч направления курсора
         Debug.DrawRay(ray.origin, ray.direction * 10f, Color.red);
 
         RaycastHit hit;
@@ -57,6 +64,7 @@ public class Management : MonoBehaviour
             UnhoverCurrent();
         }
 
+        //Выделение объекта
         if (Input.GetMouseButtonUp(0) && _hovered)
         {
             if (!Input.GetKey(KeyCode.LeftControl))
@@ -69,30 +77,31 @@ public class Management : MonoBehaviour
             Select(_hovered);
         }
 
+        // Указание точки перемещения объекта
         if (Input.GetMouseButtonUp(0) && currentSelectionState == SelectionState.UnitsSelected)
         {
             if (hit.collider && hit.collider.CompareTag("Ground"))
             {
                 int rowNumber = Mathf.CeilToInt(Mathf.Sqrt(listOfSelected.Count));
-                
-                
+
+                //Выравнивание по сетке
                 for (var index = 0; index < listOfSelected.Count; index++)
                 {
                     int row = index / rowNumber;
                     int column = index % rowNumber;
-                    
                     Vector3 point = hit.point + new Vector3(column, 0, -row);
                     listOfSelected[index].OnClickOnGround(point);
                 }
             }
         }
 
+        //Развыделение
         if (Input.GetMouseButtonUp(1))
         {
             UnselectAll();
         }
 
-        // выделение рамкой
+        //region выделение рамкой
         if (Input.GetMouseButtonDown(0))
         {
             _frameStart = Input.mousePosition;
@@ -119,6 +128,11 @@ public class Management : MonoBehaviour
 
                 foreach (var unit in allUnits)
                 {
+                    if (unit.team != Team.Player)
+                    {
+                        continue;
+                    }
+
                     Vector2 screenPosition = mainCamera.WorldToScreenPoint(unit.transform.position);
 
                     if (selectRect.Contains(screenPosition))
@@ -137,6 +151,7 @@ public class Management : MonoBehaviour
 
             currentSelectionState = listOfSelected.Count > 0 ? SelectionState.UnitsSelected : SelectionState.Other;
         }
+        //endregion выделение рамкой
     }
 
     public void Select(SelectableObject selectableObject)

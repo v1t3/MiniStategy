@@ -7,27 +7,34 @@ public class SelectableObject : MonoBehaviour
 
     public virtual void Start()
     {
-        selectionIndicator.SetActive(false);
-    }
-
-    public virtual void OnHover()
-    {
-        transform.localScale = Vector3.one * 1.1f;
-    }
-
-    public virtual void OnUnhover()
-    {
-        transform.localScale = Vector3.one;
+        if (selectionIndicator)
+        {
+            selectionIndicator.SetActive(false);
+        }
     }
 
     public virtual void Select()
     {
-        selectionIndicator.SetActive(true);
+        if (selectionIndicator)
+        {
+            selectionIndicator.SetActive(true);
+        }
     }
 
     public virtual void Unselect()
     {
-        selectionIndicator.SetActive(false);
+        if (selectionIndicator)
+        {
+            selectionIndicator.SetActive(false);
+        }
+    }
+
+    public virtual void OnHover()
+    {
+    }
+
+    public virtual void OnUnhover()
+    {
     }
 
     public virtual void OnClickOnGround(Vector3 point)

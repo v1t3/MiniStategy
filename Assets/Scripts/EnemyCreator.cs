@@ -23,7 +23,7 @@ public class EnemyCreator : MonoBehaviour
             Vector3 random = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
 
             var newEnemy = Instantiate(enemyPrefab, spawn.position, spawn.rotation);
-            newEnemy.GetComponent<Enemy>().GoToPoint(spawn.position + random);
+            newEnemy.GetComponent<Unit>().GoToPoint(spawn.position + random);
         }
     }
 }

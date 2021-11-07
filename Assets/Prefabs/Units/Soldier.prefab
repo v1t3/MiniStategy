@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 229537946}
   - component: {fileID: 229537948}
   - component: {fileID: 229537947}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: NavIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -91,7 +91,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5466690950221123815}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Center
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -126,7 +126,7 @@ GameObject:
   - component: {fileID: 6851163668220093622}
   - component: {fileID: 6851163668220093623}
   - component: {fileID: 5834684907338986161}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -234,7 +234,7 @@ GameObject:
   - component: {fileID: 6851163668273941975}
   - component: {fileID: 6851163668273941968}
   - component: {fileID: 6851163668273941969}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Indicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -314,9 +314,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6851163668439001501}
-  - component: {fileID: 6851163668548851167}
   - component: {fileID: 1556541799}
-  m_Layer: 0
+  - component: {fileID: 6851163668548851167}
+  - component: {fileID: 5463750525082609549}
+  - component: {fileID: 3789830459271956418}
+  m_Layer: 6
   m_Name: Soldier
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -341,28 +343,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6851163668548851167
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6851163668439001570}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d908ca30fb6446dea8a90271f2b7badc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  selectionIndicator: {fileID: 6851163668273941972}
-  price: 5
-  healthBar: {fileID: 7122217232208781549}
-  health: 5
-  currentState: 0
-  navMeshAgent: {fileID: 1556541799}
-  distanceToFollow: 7
-  distanceToAttack: 1
-  attackPeriod: 1
-  navigationIndicator: {fileID: 229537945}
 --- !u!195 &1556541799
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -376,7 +356,7 @@ NavMeshAgent:
   m_Speed: 3
   m_Acceleration: 50
   avoidancePriority: 50
-  m_AngularSpeed: 120
+  m_AngularSpeed: 600
   m_StoppingDistance: 0.25
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
@@ -385,6 +365,69 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 7
   m_ObstacleAvoidanceType: 4
+--- !u!114 &6851163668548851167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6851163668439001570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d908ca30fb6446dea8a90271f2b7badc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selectionIndicator: {fileID: 6851163668273941972}
+  team: 0
+  currentState: 0
+  navMeshAgent: {fileID: 1556541799}
+  distanceToFollow: 7
+  distanceToAttack: 1
+  attackPeriod: 1
+  maxFindPeriod: 3
+  onTargetPointReached:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 229537945}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  navigationIndicator: {fileID: 229537945}
+--- !u!114 &5463750525082609549
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6851163668439001570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3004a3128dfc4d8986738ae6ab1ee8e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  price: 5
+--- !u!114 &3789830459271956418
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6851163668439001570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 062fd3ed7cf441c6a22e58c0aa2939f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthBar: {fileID: 7122217232208781549}
+  healthSize: 5
 --- !u!1001 &7242499013906910635
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -436,9 +479,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2380509812251556574, guid: a3e0e2e3752bca449817e914aab646bd, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2380509812393928286, guid: a3e0e2e3752bca449817e914aab646bd, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2380509812430403688, guid: a3e0e2e3752bca449817e914aab646bd, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 8936158598628626646, guid: a3e0e2e3752bca449817e914aab646bd, type: 3}
       propertyPath: m_Name
       value: HealthBar
+      objectReference: {fileID: 0}
+    - target: {fileID: 8936158598628626646, guid: a3e0e2e3752bca449817e914aab646bd, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a3e0e2e3752bca449817e914aab646bd, type: 3}

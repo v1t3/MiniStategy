@@ -1,4 +1,5 @@
 using Player;
+using Resources;
 using UnityEngine;
 
 namespace BuildingBase
@@ -17,7 +18,7 @@ namespace BuildingBase
 
         public void TryBuy()
         {
-            int price = buildingPrefab.GetComponent<Building>().price;
+            int price = buildingPrefab.GetComponent<Price>().price;
 
             if (_playerResources.money >= price)
             {

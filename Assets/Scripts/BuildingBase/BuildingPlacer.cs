@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Security.Cryptography;
 using Player;
+using Resources;
 using UnityEngine;
 
 namespace BuildingBase
@@ -14,10 +15,8 @@ namespace BuildingBase
 
         [SerializeField] private Camera raycastCamera;
         private Plane _plane;
-
-        public Building currentBuilding;
-
-        public Dictionary<Vector2Int, Building> buildingPositions = new Dictionary<Vector2Int, Building>();
+        private Dictionary<Vector2Int, Building> _buildingPositions = new Dictionary<Vector2Int, Building>();
+        private Building _currentBuilding;
 
         private void Start()
         {
@@ -30,7 +29,7 @@ namespace BuildingBase
 
         private void Update()
         {
-            if (!currentBuilding) return;
+            if (!_currentBuilding) return;
 
             Ray ray = raycastCamera.ScreenPointToRay(Input.mousePosition);
             float distance;
@@ -40,21 +39,21 @@ namespace BuildingBase
             int xPosition = Mathf.RoundToInt(point.x);
             int zPosition = Mathf.RoundToInt(point.z);
 
-            currentBuilding.transform.position = new Vector3(xPosition, 0, zPosition) * cellSize;
+            _currentBuilding.transform.position = new Vector3(xPosition, 0, zPosition) * cellSize;
 
-            if (CanInstallBuilding(xPosition, zPosition, currentBuilding))
+            if (CanInstallBuilding(xPosition, zPosition, _currentBuilding))
             {
-                currentBuilding.DisplayAcceptablePosition();
+                DisplayAcceptablePosition();
 
                 if (Input.GetMouseButtonDown(0))
                 {
-                    InstallBuilding(xPosition, zPosition, currentBuilding);
+                    InstallBuilding(xPosition, zPosition, _currentBuilding);
                 }
                 
             }
             else
             {
-                currentBuilding.DisplayUnacceptablePosition();
+                DisplayUnacceptablePosition();
             }
             
             // отменить установку по ПКМ или Escape
@@ -64,13 +63,23 @@ namespace BuildingBase
             }
         }
 
+        public void DisplayUnacceptablePosition()
+        {
+            _currentBuilding.SetColor(Color.red);
+        }
+
+        public void DisplayAcceptablePosition()
+        {
+            _currentBuilding.ResetColor();
+        }
+
         private bool CanInstallBuilding(int xPosition, int zPosition, Building building)
         {
             for (var x = 0; x < building.xSize; x++)
             {
                 for (var z = 0; z < building.zSize; z++)
                 {
-                    if (buildingPositions.ContainsKey(new Vector2Int(xPosition + x, zPosition + z)))
+                    if (_buildingPositions.ContainsKey(new Vector2Int(xPosition + x, zPosition + z)))
                     {
                         return false;
                     }
@@ -86,12 +95,12 @@ namespace BuildingBase
             {
                 for (var z = 0; z < building.zSize; z++)
                 {
-                    buildingPositions.Add(new Vector2Int(xPosition + x, zPosition + z), building);
+                    _buildingPositions.Add(new Vector2Int(xPosition + x, zPosition + z), building);
                 }
             }
 
-            currentBuilding.SetState(BuildingState.Placed);
-            currentBuilding = null;
+            building.SetState(BuildingState.Placed);
+            _currentBuilding = null;
             _management.currentBuildState = BuildState.Other;
         }
 
@@ -108,18 +117,17 @@ namespace BuildingBase
 
         public void CancelInstallBuilding()
         {
-            int price = currentBuilding.GetComponent<Building>().price;
-            _playerResources.money += price;
+            _playerResources.money += _currentBuilding.GetComponent<Price>().price;
             
-            Destroy(currentBuilding.gameObject);
-            currentBuilding = null;
+            Destroy(_currentBuilding.gameObject);
+            _currentBuilding = null;
             _management.currentBuildState = BuildState.Other;
         }
 
         public void CreateBuilding(GameObject buildingPrefab)
         {
             GameObject newBuilding = Instantiate(buildingPrefab);
-            currentBuilding = newBuilding.GetComponent<Building>();
+            _currentBuilding = newBuilding.GetComponent<Building>();
             _management.currentBuildState = BuildState.Installing;
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using Player;
+using Resources;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -43,7 +44,7 @@ namespace Units
 
         private void TryBuy()
         {
-            int price = unitPrefab.GetComponent<Unit>().price;
+            int price = unitPrefab.GetComponent<Price>().price;
 
             if (_playerResources.money >= price)
             {
