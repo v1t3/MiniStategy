@@ -126,7 +126,7 @@ namespace PlaceBase
 
         public void CancelInstallBuilding()
         {
-            _playerResources.money += _currentBuilding.GetComponent<Price>().price;
+            _playerResources.Money += _currentBuilding.GetComponent<Price>().price;
             
             Destroy(_currentBuilding.gameObject);
             _currentBuilding = null;

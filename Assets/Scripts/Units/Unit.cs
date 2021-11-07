@@ -312,7 +312,7 @@ namespace Units
                         var position = building.transform.position + new Vector3(x, 0, z);
                         float distance = Vector3.Distance(transform.position, position);
 
-                        if (distance < minDistance && distance < distanceToFollow)
+                        if (distance < minDistance)
                         {
                             minDistance = distance;
                             closestBuilding = building;

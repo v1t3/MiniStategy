@@ -30,7 +30,6 @@ namespace BuildingBase
         private Color _startColor;
 
         [SerializeField] private CraftMenu craftMenu;
-        [SerializeField] private UnitButton[] unitButtons;
 
         private void Awake()
         {
@@ -48,6 +47,7 @@ namespace BuildingBase
 
             if (craftMenu)
             {
+                var unitButtons = craftMenu.GetComponentsInChildren<UnitButton>();
                 foreach (var btn in unitButtons)
                 {
                     btn.SetPlacer(_unitPlacer);

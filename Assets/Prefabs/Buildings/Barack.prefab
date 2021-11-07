@@ -555,7 +555,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3004a3128dfc4d8986738ae6ab1ee8e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  price: 20
+  price: 70
 --- !u!114 &7505111064471262392
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -569,7 +569,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   healthBar: {fileID: 2789307210918894893}
-  healthSize: 20
+  healthSize: 150
 --- !u!114 &7026585968182530347
 MonoBehaviour:
   m_ObjectHideFlags: 0

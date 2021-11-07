@@ -50,17 +50,15 @@ namespace PlaceBase
         {
             if (_objectPrice)
             {
-                int price = objectPrefab.GetComponent<Price>().price;
-
-                if (_playerResources.money >= price)
+                if (_playerResources.Money > 0 && _playerResources.Money >= _objectPrice.price)
                 {
-                    _playerResources.money -= price;
+                    _playerResources.Money -= _objectPrice.price;
                     RemoveLeftToCreate();
                     _placer.Create(objectPrefab);
                 }
                 else
                 {
-                    Debug.Log("enough money");
+                    Debug.Log("not enough money");
                     ResetLeftToCreate();
                 }
             }
@@ -78,8 +76,16 @@ namespace PlaceBase
 
         public void AddUnitToCreate()
         {
-            _leftToCreate++;
-            ShowLeftToCreateText();
+            if (_playerResources.Money > 0 && _playerResources.Money >= _objectPrice.price)
+            {
+                _leftToCreate++;
+                ShowLeftToCreateText();
+            }
+            else
+            {
+                Debug.Log("not enough money");
+                ResetLeftToCreate();
+            }
         }
 
         private void RemoveLeftToCreate()

@@ -1,17 +1,21 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Units;
+using BuildingBase;
+using PlaceBase;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class EnemyCreator : MonoBehaviour
 {
-    [SerializeField] private Transform spawn;
+    [SerializeField] private Barack barack;
+    private UnitPlacer _unitPlacer;
+    
     [SerializeField] private GameObject enemyPrefab;
     [SerializeField] private float creationPeriod;
 
     private float _timer;
+
+    private void Start()
+    {
+        _unitPlacer = barack.GetComponent<UnitPlacer>();
+    }
 
     private void Update()
     {
@@ -20,10 +24,7 @@ public class EnemyCreator : MonoBehaviour
         if (_timer > creationPeriod)
         {
             _timer = 0;
-            Vector3 random = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
-
-            var newEnemy = Instantiate(enemyPrefab, spawn.position, spawn.rotation);
-            newEnemy.GetComponent<Unit>().GoToPoint(spawn.position + random);
+            _unitPlacer.Create(enemyPrefab);
         }
     }
 }
